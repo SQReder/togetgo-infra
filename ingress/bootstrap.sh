@@ -12,7 +12,13 @@ cd "$(dirname "$0")"
 ACME_EMAIL=sqreder@gmail.com
 DOMAINS="web.togetgo.app admin.togetgo.app s3.togetgo.app"
 
-install -d -m 750 /opt/ingress /opt/ingress/state /opt/ingress/letsencrypt
+install -d -m 750 /opt/ingress /opt/ingress/state /opt/ingress/letsencrypt /opt/ingress/secrets
+
+if [ ! -f /opt/ingress/secrets/mtg.toml ]; then
+    install -m 600 secrets.example/mtg.toml /opt/ingress/secrets/mtg.toml
+    mtg_secret=$(docker run --rm nineseconds/mtg:2 generate-secret storage.googleapis.com)
+    sed -i "s/REPLACE_ME/$mtg_secret/" /opt/ingress/secrets/mtg.toml
+fi
 install -d -m 755 /opt/ingress/certbot/www
 docker network inspect togetgo-public >/dev/null 2>&1 || docker network create togetgo-public
 

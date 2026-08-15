@@ -8,7 +8,24 @@
 
 - `ingress/` — единая точка входа HTTP/HTTPS: nginx в docker compose,
   терминация TLS для `web/admin/s3.togetgo.app`, выпуск и продление
-  сертификатов Let's Encrypt через certbot (webroot).
+  сертификатов Let's Encrypt через certbot (webroot), MTProto-прокси mtg.
+
+## Схема порта 443
+
+Порт 443 слушает stream-блок nginx (`ssl_preread`, TLS не терминируется)
+и маршрутизирует по SNI:
+
+- SNI FakeTLS-домена mtg (`storage.googleapis.com`) — в контейнер
+  `ingress-mtg` (MTProto-прокси, чистый TCP);
+- всё остальное — в локальный http-блок на 8444, где терминируется TLS.
+
+Оба апстрима получают PROXY protocol; http-блок восстанавливает клиентский
+IP через `real_ip_header proxy_protocol`, mtg — через
+`proxy-protocol-listener = true`.
+
+FakeTLS-домен задан в двух местах и должен совпадать: stream-map в
+`nginx/nginx.conf` и секрет в `/opt/ingress/secrets/mtg.toml`
+(генерация — см. `ingress/secrets.example/mtg.toml`).
 
 Приложение togetgo живет отдельно в `/opt/togetgo` и этим репозиторием
 не управляется.

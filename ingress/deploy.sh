@@ -3,6 +3,11 @@
 set -eu
 cd "$(dirname "$0")"
 
+if [ ! -f /opt/ingress/secrets/mtg.toml ]; then
+    echo "missing /opt/ingress/secrets/mtg.toml — see secrets.example/mtg.toml" >&2
+    exit 1
+fi
+
 install -d -m 750 /opt/ingress
 rsync -r --delete --checksum nginx/ /opt/ingress/nginx/
 rsync -r --checksum bin/ /opt/ingress/bin/

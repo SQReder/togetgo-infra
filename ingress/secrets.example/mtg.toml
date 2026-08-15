@@ -1,0 +1,13 @@
+# Шаблон для /opt/ingress/secrets/mtg.toml (в репозиторий не коммитится).
+#
+# Секрет генерируется под FakeTLS-домен и должен совпадать с доменом
+# в stream-map nginx.conf (storage.googleapis.com):
+#
+#   docker run --rm nineseconds/mtg:2 generate-secret storage.googleapis.com
+#
+secret = "REPLACE_ME"
+bind-to = "0.0.0.0:3128"
+
+# Соединения приходят только от nginx (ssl_preread) с PROXY protocol,
+# напрямую порт наружу не опубликован.
+proxy-protocol-listener = true

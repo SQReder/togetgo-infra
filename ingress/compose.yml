@@ -39,6 +39,26 @@ services:
         max-file: "3"
     networks:
       - togetgo_public
+      - mtg
+
+  mtg:
+    image: nineseconds/mtg:2
+    container_name: ingress-mtg
+    restart: unless-stopped
+    volumes:
+      - ./secrets/mtg.toml:/config.toml:ro
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    networks:
+      - mtg
 
   certbot:
     image: certbot/certbot:v5.6.0
@@ -56,3 +76,5 @@ networks:
   togetgo_public:
     name: togetgo-public
     external: true
+  mtg:
+    name: ingress-mtg
