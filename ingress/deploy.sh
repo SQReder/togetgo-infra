@@ -13,6 +13,10 @@ rsync -r --delete --checksum nginx/ /opt/ingress/nginx/
 rsync -r --checksum bin/ /opt/ingress/bin/
 install -m 644 compose.yml /opt/ingress/compose.yml
 
+# Валидация в одноразовом контейнере с теми же маунтами — до того, как
+# up -d пересоздаст рабочий nginx с новым конфигом.
+docker compose -f /opt/ingress/compose.yml run --rm --no-deps nginx nginx -t
+
 docker compose -f /opt/ingress/compose.yml up -d --remove-orphans
 docker compose -f /opt/ingress/compose.yml exec -T nginx nginx -t
 docker compose -f /opt/ingress/compose.yml exec -T nginx nginx -s reload
