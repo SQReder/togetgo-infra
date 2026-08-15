@@ -11,6 +11,13 @@ if ! diff -q compose.yml /opt/ingress/compose.yml >/dev/null; then
     echo "compose.yml differs"
     rc=1
 fi
+for unit in systemd/*; do
+    name=$(basename "$unit")
+    if ! cmp -s "$unit" "/etc/systemd/system/$name"; then
+        echo "systemd unit $name differs"
+        rc=1
+    fi
+done
 
 [ "$rc" -eq 0 ] && echo "no drift"
 exit "$rc"

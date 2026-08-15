@@ -1,0 +1,11 @@
+[Unit]
+Description=Run ingress certificate renewal twice daily
+
+[Timer]
+OnCalendar=*-*-* 03,15:17:00 UTC
+RandomizedDelaySec=30m
+Persistent=true
+Unit=ingress-cert-renew.service
+
+[Install]
+WantedBy=timers.target

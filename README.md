@@ -71,5 +71,11 @@ sudo ./ingress/bootstrap.sh
 ## Продление сертификатов
 
 `ingress/bin/renew-certificates.sh` продлевает сертификаты и делает reload
-nginx только при фактическом обновлении. Запускается по расписанию из
-root crontab (проверить: `sudo crontab -l`).
+nginx только при фактическом обновлении. Запускается systemd-таймером
+`ingress-cert-renew.timer` дважды в день (03:17 и 15:17 UTC, задержка
+до 30 минут). Юниты лежат в `ingress/systemd/` и устанавливаются
+`deploy.sh` при изменении.
+
+Проверка: `systemctl status ingress-cert-renew.timer`; репетиция
+продления: `sudo docker compose -f /opt/ingress/compose.yml run --rm
+certbot renew --dry-run`.

@@ -1,0 +1,14 @@
+[Unit]
+Description=Renew ingress TLS certificates and reload Nginx
+Requires=docker.service
+After=docker.service network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/ingress
+ExecStart=/usr/bin/flock -n /run/lock/ingress-cert-renew.lock /opt/ingress/bin/renew-certificates.sh
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/opt/ingress/letsencrypt /opt/ingress/state /run/lock
